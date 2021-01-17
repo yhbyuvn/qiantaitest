@@ -2,6 +2,62 @@
     <div>
 
       <div>
+        <el-dialog title="新增" :visible.sync="todoProValue">
+          <el-table
+            :data="proValueData"
+            border
+            style="width: 100%">
+
+            <el-table-column
+              prop="id"
+              label="序号"
+              width="150">
+            </el-table-column>
+
+            <el-table-column
+              prop="value"
+              label="属性值名"
+              width="150">
+            </el-table-column>
+
+            <el-table-column
+              prop="valuech"
+              label="属性值中文名"
+              width="150">
+            </el-table-column>
+
+            <el-table-column
+              prop="proid"
+              label="属性id"
+              width="150">
+            </el-table-column>
+
+            <el-table-column
+              label="操作"
+              width="200">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  @click="toupPro(scope.$index, scope.row)"
+                >编辑</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="delPro(scope.$index, scope.row)"
+                >删除</el-button>
+              </template>
+            </el-table-column>
+
+          </el-table>
+        </el-dialog>
+      </div>
+
+
+
+
+
+
+      <div>
         <el-dialog title="新增" :visible.sync="toaddPro">
           <el-form :model="addform">
             <el-form-item label="名称" >
@@ -22,7 +78,6 @@
                 </el-option>
               </el-select>
             </el-form-item>
-
 
             <el-form-item label="输入类型" >
               <el-radio-group v-model="addform.type">
@@ -117,45 +172,45 @@
             <el-table-column
               prop="id"
               label="序号"
-              width="180">
+              width="150">
             </el-table-column>
 
             <el-table-column
               prop="name"
               label="属性名"
-              width="180">
+              width="150">
             </el-table-column>
 
             <el-table-column
               prop="namech"
               label="属性中文名"
-              width="180">
+              width="150">
             </el-table-column>
 
             <el-table-column
               prop="typeid"
               label="类型id"
               :formatter="typeproh"
-              width="180">
+              width="150">
             </el-table-column>
 
             <el-table-column
               prop="type"
               label="类型"
               :formatter="inputType"
-              width="180">
+              width="150">
             </el-table-column>
 
             <el-table-column
               prop="issku"
               label="是否为sku属性"
               :formatter="skuyos"
-              width="180">
+              width="150">
             </el-table-column>
 
             <el-table-column
               label="操作"
-              width="180">
+              width="300">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
@@ -166,6 +221,11 @@
                   type="danger"
                   @click="delPro(scope.$index, scope.row)"
                   >删除</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="doProValue(scope.$index, scope.row)"
+                  >属性值操作</el-button>
               </template>
             </el-table-column>
 
@@ -212,7 +272,9 @@
               issku:"",
               isdel:0
             },
-            toupProb:false
+            toupProb:false,
+            todoProValue:false,
+            proValueData:[]
           }
 
         },
@@ -321,6 +383,15 @@
             location.reload();
           }).catch(function () {
             alert("err")
+          })
+        },
+        doProValue:function (index,row) {
+          console.log(row.id)
+          this.todoProValue=true;
+          this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+row.id).then(dd=>{
+            this.proValueData=dd.data.data;
+          }).catch(function () {
+            alert("erer")
           })
         }
       }
