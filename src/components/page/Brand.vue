@@ -128,7 +128,7 @@
           label="图片"
           width="180">
           <template slot-scope="scope">
-            <img height="50px" :src="'http://localhost:8080/'+scope.row.imgpath"/>
+            <img height="50px" :src="scope.row.imgpath"/>
           </template>
         </el-table-column>
 
@@ -219,10 +219,10 @@
           this.chaBrand(page);
         },
         uploadBr:function (response,imgpath,images) {
-          this.addform.imgpath=response.data.filePath;
+          this.addform.imgpath=response.data;
         },
         uploadBrup:function (response,imgpath,images) {
-          this.upform.imgpath=response.data.filePath;
+          this.upform.imgpath=response.data;
         },
         addBrand:function () {
           this.addform.bande=this.addform.name.substr(0,1);

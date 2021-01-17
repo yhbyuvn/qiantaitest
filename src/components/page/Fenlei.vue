@@ -165,7 +165,6 @@
           var data=this.$qs.stringify({"id":data.data.id,"name":data.label,"isdel":1});
           this.$axios.post("http://localhost:8080/api/type/update",data).then(dd=>{
             alert("ok");
-            this.toupType=false;
             location.reload();
           }).catch(function () {
             alert("err")
