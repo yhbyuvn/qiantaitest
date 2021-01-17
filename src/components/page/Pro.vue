@@ -2,7 +2,7 @@
     <div>
 
       <div>
-        <el-dialog title="新增" :visible.sync="todoProValue">
+        <el-dialog title="属性值表" :visible.sync="todoProValue">
           <el-table
             :data="proValueData"
             border
@@ -38,22 +38,61 @@
               <template slot-scope="scope">
                 <el-button
                   size="mini"
-                  @click="toupPro(scope.$index, scope.row)"
+                  @click="gotoupProVal(scope.$index, scope.row)"
                 >编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
-                  @click="delPro(scope.$index, scope.row)"
+                  @click="delProVal(scope.$index, scope.row)"
                 >删除</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="gotoaddProVal(scope.$index, scope.row)"
+                >新增</el-button>
               </template>
             </el-table-column>
 
           </el-table>
         </el-dialog>
+
       </div>
 
 
+      <div>
+        <el-dialog title="属性值新增" :visible.sync="toaddProVal">
+          <el-form :model="addPvform">
+            <el-form-item label="属性值名称" >
+              <el-input v-model="addPvform.value" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="属性值中文名称" >
+              <el-input v-model="addPvform.valuech" autocomplete="off"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="toaddProVal = false">取 消</el-button>
+            <el-button type="primary" @click="addProVal">确 定</el-button>
+          </div>
+        </el-dialog>
+      </div>
 
+
+      <div>
+        <el-dialog title="属性值修改" :visible.sync="toupProVal">
+          <el-form :model="upPvform">
+            <el-form-item label="属性值名称" >
+              <el-input v-model="upPvform.value" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="属性值中文名称" >
+              <el-input v-model="upPvform.valuech" autocomplete="off"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="toupProVal = false">取 消</el-button>
+            <el-button type="primary" @click="upProVal">确 定</el-button>
+          </div>
+        </el-dialog>
+      </div>
 
 
 
@@ -274,7 +313,22 @@
             },
             toupProb:false,
             todoProValue:false,
-            proValueData:[]
+            toaddProVal:false,
+            toupProVal:false,
+            proValueData:[],
+            addPvform:{
+              value:"",
+              valuech:"",
+              proid:"",
+              isdel:0
+            },
+            upPvform:{
+              value:"",
+              valuech:"",
+              proid:"",
+              isdel:0,
+              id:""
+            }
           }
 
         },
@@ -393,7 +447,35 @@
           }).catch(function () {
             alert("erer")
           })
-        }
+        },
+        gotoaddProVal:function(index,row){
+          this.toaddProVal=true;
+          this.addPvform.proid=row.proid;
+        },
+        gotoupProVal:function(index,row){
+          this.toupProVal=true;
+          this.upPvform.proid=row.proid;
+          this.upPvform.value=row.value;
+          this.upPvform.valuech=row.valuech;
+          this.upPvform.id=row.id;
+        },
+        addProVal:function () {
+          var data=this.$qs.stringify(this.addPvform);
+          this.$axios.post("http://localhost:8080/api/type/addProValue",data).then(dd=>{
+            this.toaddProVal=false;
+          }).catch(function () {
+            alert("erer")
+          })
+        },
+        upProVal:function () {
+          var data=this.$qs.stringify(this.upPvform);
+          this.$axios.post("http://localhost:8080/api/type/upProValue",data).then(dd=>{
+            this.toupProVal=false;
+          }).catch(function () {
+            alert("erer")
+          })
+        },
+
       }
     }
 </script>
