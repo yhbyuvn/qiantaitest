@@ -23,6 +23,11 @@ export default new Router({
           path:'/table',
           component:()=> import('../components/page/Brand.vue'),
           meta:{title:'品牌'}
+        },
+        {
+          path:'/tabs',
+          component:()=> import('../components/page/Pro.vue'),
+          meta:{title:'属性'}
         }
       ]
     }
