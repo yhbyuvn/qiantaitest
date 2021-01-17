@@ -3,6 +3,7 @@
 
       <div>
         <el-dialog title="属性值表" :visible.sync="todoProValue">
+          <el-button type="primary" @click="gotoaddProVal" >新增</el-button>
           <el-table
             :data="proValueData"
             border
@@ -29,6 +30,7 @@
             <el-table-column
               prop="proid"
               label="属性id"
+              :formatter="pvpro"
               width="150">
             </el-table-column>
 
@@ -45,11 +47,6 @@
                   type="danger"
                   @click="delProVal(scope.$index, scope.row)"
                 >删除</el-button>
-                <el-button
-                  size="mini"
-                  type="danger"
-                  @click="gotoaddProVal(scope.$index, scope.row)"
-                >新增</el-button>
               </template>
             </el-table-column>
 
@@ -62,6 +59,9 @@
       <div>
         <el-dialog title="属性值新增" :visible.sync="toaddProVal">
           <el-form :model="addPvform">
+            <el-form-item label="属性" >
+              <el-input v-model="addPvform.pvname" autocomplete="off" disabled></el-input>
+            </el-form-item>
             <el-form-item label="属性值名称" >
               <el-input v-model="addPvform.value" autocomplete="off"></el-input>
             </el-form-item>
@@ -80,6 +80,9 @@
       <div>
         <el-dialog title="属性值修改" :visible.sync="toupProVal">
           <el-form :model="upPvform">
+            <el-form-item label="属性" >
+              <el-input v-model="upPvform.pvname" autocomplete="off" disabled></el-input>
+            </el-form-item>
             <el-form-item label="属性值名称" >
               <el-input v-model="upPvform.value" autocomplete="off"></el-input>
             </el-form-item>
@@ -320,14 +323,16 @@
               value:"",
               valuech:"",
               proid:"",
-              isdel:0
+              isdel:0,
+              pvname:""
             },
             upPvform:{
               value:"",
               valuech:"",
               proid:"",
               isdel:0,
-              id:""
+              id:"",
+              pvname:""
             }
           }
 
@@ -369,6 +374,19 @@
           }
 
         },
+        pvpro:function(e,r){
+          var da=this;
+          for (let i = 0; i <this.proData.length ; i++) {
+            if (e.proid==this.proData[i].id) {
+              for (let j = 0; j <da.protype.length ; j++) {
+                if (this.proData[i].typeid==da.protype[j].id) {
+                  return da.protype[j].name;
+                }
+              }
+            }
+          }
+
+        },
         inputType:function (e,r) {
           if (e.type==0){
             return "输入框";
@@ -387,6 +405,7 @@
             return "是"
           }
         },
+
         addPro:function () {
           var data=this.$qs.stringify(this.addform);
           this.$axios.post("http://localhost:8080/api/type/addPro",data).then(dd=>{
@@ -448,16 +467,28 @@
             alert("erer")
           })
         },
-        gotoaddProVal:function(index,row){
+        gotoaddProVal:function(){
+          var th=this;
           this.toaddProVal=true;
-          this.addPvform.proid=row.proid;
+          this.addPvform.proid=this.proValueData[0].proid;
+          for (let i = 0; i <th.proData.length ; i++) {
+            if (this.proValueData[0].proid==th.proData[i].id) {
+              this.addPvform.pvname=th.proData[i].namech;
+            }
+          }
         },
         gotoupProVal:function(index,row){
+          var th=this;
           this.toupProVal=true;
           this.upPvform.proid=row.proid;
           this.upPvform.value=row.value;
           this.upPvform.valuech=row.valuech;
           this.upPvform.id=row.id;
+          for (let i = 0; i <th.proData.length ; i++) {
+            if (row.proid==th.proData[i].id) {
+              this.upPvform.pvname=th.proData[i].namech;
+            }
+          }
         },
         addProVal:function () {
           var data=this.$qs.stringify(this.addPvform);
