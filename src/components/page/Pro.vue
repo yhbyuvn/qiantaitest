@@ -475,7 +475,19 @@
             alert("erer")
           })
         },
-
+        delProVal:function (index,row) {
+          this.upPvform.proid=row.proid;
+          this.upPvform.value=row.value;
+          this.upPvform.valuech=row.valuech;
+          this.upPvform.id=row.id;
+          this.upPvform.isdel=1;
+          var data=this.$qs.stringify(this.upPvform);
+          this.$axios.post("http://localhost:8080/api/type/upProValue",data).then(dd=>{
+            alert("ok");
+          }).catch(function () {
+            alert("erer")
+          })
+        }
       }
     }
 </script>
