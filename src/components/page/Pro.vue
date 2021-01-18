@@ -2,9 +2,10 @@
     <div>
 
       <div>
-        <el-dialog title="属性值表" :visible.sync="todoProValue">
+        <el-dialog :title="pvDivName" :visible.sync="todoProValue">
           <el-button type="primary" @click="gotoaddProVal" >新增</el-button>
           <el-table
+            v-if="!toaddProVal"
             :data="proValueData"
             border
             style="width: 100%">
@@ -51,30 +52,31 @@
             </el-table-column>
 
           </el-table>
-        </el-dialog>
 
-      </div>
-
-
-      <div>
-        <el-dialog title="属性值新增" :visible.sync="toaddProVal">
-          <el-form :model="addPvform">
-            <el-form-item label="属性" >
-              <el-input v-model="addPvform.pvname" autocomplete="off" disabled></el-input>
-            </el-form-item>
-            <el-form-item label="属性值名称" >
-              <el-input v-model="addPvform.value" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="属性值中文名称" >
-              <el-input v-model="addPvform.valuech" autocomplete="off"></el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="toaddProVal = false">取 消</el-button>
-            <el-button type="primary" @click="addProVal">确 定</el-button>
+          <div>
+            <el-form :model="addPvform" v-if="toaddProVal">
+              <el-form-item label="属性" >
+                <el-input v-model="addPvform.pvname" autocomplete="off" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="属性值名称" >
+                <el-input v-model="addPvform.value" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="属性值中文名称" >
+                <el-input v-model="addPvform.valuech" autocomplete="off"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="toaddProVal = false">取 消</el-button>
+              <el-button type="primary" @click="addProVal">确 定</el-button>
+            </div>
           </div>
+
+
         </el-dialog>
+
       </div>
+
+
 
 
       <div>
@@ -101,12 +103,12 @@
 
       <div>
         <el-dialog title="新增" :visible.sync="toaddPro">
-          <el-form :model="addform">
-            <el-form-item label="名称" >
+          <el-form :model="addform" :rules="addProRules">
+            <el-form-item label="名称" prop="name">
               <el-input v-model="addform.name" autocomplete="off"></el-input>
             </el-form-item>
 
-            <el-form-item label="中文名称" >
+            <el-form-item label="中文名称" prop="namech">
               <el-input v-model="addform.namech" autocomplete="off"></el-input>
             </el-form-item>
 
@@ -265,6 +267,7 @@
                   >删除</el-button>
                 <el-button
                   size="mini"
+                  v-if="scope.row.type!=0"
                   type="danger"
                   @click="doProValue(scope.$index, scope.row)"
                   >属性值操作</el-button>
@@ -333,6 +336,17 @@
               isdel:0,
               id:"",
               pvname:""
+            },
+            pvDivName:"",
+            addProRules:{
+              name:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ],
+              namech:[
+                { required: true, message: '请输入中文名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ]
             }
           }
 
@@ -459,8 +473,8 @@
           })
         },
         doProValue:function (index,row) {
-          console.log(row.id)
           this.todoProValue=true;
+          this.pvDivName=row.name+"的相关操作";
           this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+row.id).then(dd=>{
             this.proValueData=dd.data.data;
           }).catch(function () {

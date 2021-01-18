@@ -15,13 +15,13 @@
 
       <div>
         <el-dialog title="新增" :visible.sync="toaddBrand">
-          <el-form :model="addform">
-            <el-form-item label="名称" >
+          <el-form :model="addform" :rules="addBrandRules">
+            <el-form-item label="名称" prop="name">
               <el-input v-model="addform.name" autocomplete="off"></el-input>
             </el-form-item>
 
-            <el-form-item label="顺序" >
-              <el-input v-model="addform.ord" autocomplete="off"></el-input>
+            <el-form-item label="顺序" prop="ord">
+              <el-input v-model.number="addform.ord" autocomplete="off"></el-input>
             </el-form-item>
 
             <el-upload
@@ -185,7 +185,7 @@
               imgpath:"",
               banddesc:"",
               bande:"",
-              ord:""
+              ord:0
             },
             upform:{
               id:"",
@@ -194,7 +194,17 @@
               banddesc:"",
               bande:"",
               isdel:0,
-              ord:""
+              ord:0
+            },
+            addBrandRules:{
+              name:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ],
+              ord:[
+                { required: true, message: '顺序值不能为空'},
+                { type: 'number', message: '必须为数字值'}
+              ]
             }
           }
         },
@@ -229,6 +239,13 @@
           var data=this.$qs.stringify(this.addform);
           this.$axios.post("http://localhost:8080/api/type/addBrand",data).then(dd=>{
             alert("ok");
+            this.addform={
+              name:"",
+              imgpath:"",
+              banddesc:"",
+              bande:"",
+              ord:0
+            }
             location.reload();
             this.toaddBrand=false;
           }).catch(function () {
