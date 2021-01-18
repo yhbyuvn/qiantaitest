@@ -54,14 +54,14 @@
           </el-table>
 
           <div>
-            <el-form :model="addPvform" v-if="toaddProVal">
+            <el-form :model="addPvform" v-if="toaddProVal" :rules="ptrules">
               <el-form-item label="属性" >
                 <el-input v-model="addPvform.pvname" autocomplete="off" disabled></el-input>
               </el-form-item>
-              <el-form-item label="属性值名称" >
+              <el-form-item label="属性值名称" prop="value">
                 <el-input v-model="addPvform.value" autocomplete="off"></el-input>
               </el-form-item>
-              <el-form-item label="属性值中文名称" >
+              <el-form-item label="属性值中文名称" prop="valuech">
                 <el-input v-model="addPvform.valuech" autocomplete="off"></el-input>
               </el-form-item>
             </el-form>
@@ -291,6 +291,20 @@
     export default {
         name: "Pro",
         data(){
+          var checkValue = (rule, value, callback) => {
+            if (/^[a-zA-Z]+$/.test(value)) {
+              callback();
+            }else {
+              callback(new Error('只能输入英文字母'));
+            }
+          };
+          var checkValuech = (rule, value, callback) => {
+            if (/^[\u4e00-\u9fa5]+$/i.test(value)) {
+              callback();
+            }else {
+              callback(new Error('只能输入汉字'));
+            }
+          };
           return{
             toaddPro:false,
             proData:[],
@@ -348,9 +362,19 @@
                 { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
               ]
             },
+            ptrules:{
+              value:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { validator: checkValue, trigger: 'blur' }
+              ],
+              valuech:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { validator: checkValuech, trigger: 'blur' }
+              ]
+            },
             pvDivProid:"",
             protypes:[],
-            proTypeName:""
+            proTypeName:"",
           }
 
         },
@@ -525,6 +549,13 @@
         gotoaddProVal:function(){
           var th=this;
           this.toaddProVal=true;
+          this.addPvform={
+            value:"",
+              valuech:"",
+              proid:"",
+              isdel:0,
+              pvname:""
+          }
           this.addPvform.proid=this.pvDivProid;
           for (let i = 0; i <th.proData.length ; i++) {
             if (this.pvDivProid==th.proData[i].id) {
