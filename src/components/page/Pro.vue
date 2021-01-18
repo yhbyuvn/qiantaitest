@@ -115,7 +115,7 @@
             <el-form-item label="类型" >
               <el-select v-model="addform.typeid" placeholder="请选择">
                 <el-option
-                  v-for="item in protype"
+                  v-for="item in protypes"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id">
@@ -161,7 +161,7 @@
             <el-form-item label="类型" >
               <el-select v-model="upform.typeid" placeholder="请选择">
                 <el-option
-                  v-for="item in protype"
+                  v-for="item in protypes"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id">
@@ -348,7 +348,9 @@
                 { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
               ]
             },
-            pvDivProid:""
+            pvDivProid:"",
+            protypes:[],
+            proTypeName:""
           }
 
         },
@@ -376,9 +378,48 @@
         chatype:function () {
           this.$axios.get("http://localhost:8080/api/type/getData").then(dd=>{
             this.protype=dd.data.data;
+            this.getChildType();
+            for (let i = 0; i <this.protypes.length ; i++) {
+              this.proTypeName="";
+              this.pushptName(this.protypes[i]);
+              var qwerdf=this.proTypeName.split("/").reverse().join("/");
+              this.protypes[i].name=qwerdf.substr(0,qwerdf.length-1);
+            }
           }).catch(function () {
             alert("error")
           })
+        },
+        pushptName:function(node){
+          if (node.id!=0){
+            this.proTypeName+="/"+node.name;
+            for (let i = 0; i <this.protype.length ; i++) {
+              if (node.pid==this.protype[i].id) {
+                this.pushptName(this.protype[i]);
+                break;
+              }
+            }
+          }else {
+            this.proTypeName+="/"+node.name;
+          }
+          
+        },
+        getChildType:function(){
+          for (let i = 0; i <this.protype.length ; i++) {
+            var node=this.protype[i];
+            this.isChildNode(node)
+          }
+        },
+        isChildNode:function(node){
+          var tof=true;
+          for (let i = 0; i < this.protype.length; i++) {
+            if (node.id==this.protype[i].pid) {
+              tof=false;
+              break;
+            }
+          }
+          if (tof==true){
+            this.protypes.push(node);
+          }
         },
         typeproh:function (e,r) {
 
@@ -469,9 +510,10 @@
         },
         doProValue:function (index,row) {
           this.todoProValue=true;
+
           this.pvDivName=row.name+"的相关操作";
           this.pvDivProid=row.id;
-          this.gotochaPv(row.id);
+          this.gotochaPv(this.pvDivProid);
         },
         gotochaPv:function(proid){
           this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+proid).then(dd=>{
@@ -483,9 +525,9 @@
         gotoaddProVal:function(){
           var th=this;
           this.toaddProVal=true;
-          this.addPvform.proid=this.proValueData[0].proid;
+          this.addPvform.proid=this.pvDivProid;
           for (let i = 0; i <th.proData.length ; i++) {
-            if (this.proValueData[0].proid==th.proData[i].id) {
+            if (this.pvDivProid==th.proData[i].id) {
               this.addPvform.pvname=th.proData[i].namech;
             }
           }
@@ -508,6 +550,13 @@
           this.$axios.post("http://localhost:8080/api/type/addProValue",data).then(dd=>{
             this.toaddProVal=false;
             this.gotochaPv(this.pvDivProid);
+            this.addPvform={
+              value:"",
+                valuech:"",
+                proid:"",
+                isdel:0,
+                pvname:""
+            }
           }).catch(function () {
             alert("erer")
           })
