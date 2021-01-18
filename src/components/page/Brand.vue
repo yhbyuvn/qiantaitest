@@ -8,7 +8,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="chaBrand(1)">查询</el-button>
-            <el-button type="primary" @click="toaddBrand=true">新增</el-button>
+            <el-button type="primary" @click="gotoaddBrand">新增</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -239,13 +239,7 @@
           var data=this.$qs.stringify(this.addform);
           this.$axios.post("http://localhost:8080/api/type/addBrand",data).then(dd=>{
             alert("ok");
-            this.addform={
-              name:"",
-              imgpath:"",
-              banddesc:"",
-              bande:"",
-              ord:0
-            }
+
             location.reload();
             this.toaddBrand=false;
           }).catch(function () {
@@ -288,6 +282,16 @@
           }).catch(function () {
             alert("err")
           })
+        },
+        gotoaddBrand:function () {
+          this.toaddBrand=true;
+          this.addform={
+            name:"",
+            imgpath:"",
+            banddesc:"",
+            bande:"",
+            ord:0
+          }
         }
       }
     }

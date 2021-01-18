@@ -64,12 +64,12 @@ export default {
                 {
                     icon: 'el-icon-lx-cascades',
                     index: 'table',
-                    title: '基础表格'
+                    title: '品牌表'
                 },
                 {
                     icon: 'el-icon-lx-copy',
                     index: 'tabs',
-                    title: 'tab选项卡'
+                    title: '属性表'
                 },
                 {
                     icon: 'el-icon-lx-calendar',

@@ -202,7 +202,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="chaPro(1)">查询</el-button>
-              <el-button type="primary" @click="toaddPro=true" >新增</el-button>
+              <el-button type="primary" @click="gotoaddPro" >新增</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -347,7 +347,8 @@
                 { required: true, message: '请输入中文名称', trigger: 'blur' },
                 { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
               ]
-            }
+            },
+            pvDivProid:""
           }
 
         },
@@ -426,13 +427,7 @@
             alert("ok");
             location.reload();
             this.toaddPro=false;
-            this.addform={
-              name:"",
-              namech:"",
-              typeid:"请选择",
-              type:"",
-              issku:""
-            }
+
           }).catch(function () {
             alert("err")
           })
@@ -475,7 +470,11 @@
         doProValue:function (index,row) {
           this.todoProValue=true;
           this.pvDivName=row.name+"的相关操作";
-          this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+row.id).then(dd=>{
+          this.pvDivProid=row.id;
+          this.gotochaPv(row.id);
+        },
+        gotochaPv:function(proid){
+          this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+proid).then(dd=>{
             this.proValueData=dd.data.data;
           }).catch(function () {
             alert("erer")
@@ -508,6 +507,7 @@
           var data=this.$qs.stringify(this.addPvform);
           this.$axios.post("http://localhost:8080/api/type/addProValue",data).then(dd=>{
             this.toaddProVal=false;
+            this.gotochaPv(this.pvDivProid);
           }).catch(function () {
             alert("erer")
           })
@@ -516,6 +516,7 @@
           var data=this.$qs.stringify(this.upPvform);
           this.$axios.post("http://localhost:8080/api/type/upProValue",data).then(dd=>{
             this.toupProVal=false;
+            this.gotochaPv(this.pvDivProid);
           }).catch(function () {
             alert("erer")
           })
@@ -529,9 +530,20 @@
           var data=this.$qs.stringify(this.upPvform);
           this.$axios.post("http://localhost:8080/api/type/upProValue",data).then(dd=>{
             alert("ok");
+            this.gotochaPv(this.pvDivProid);
           }).catch(function () {
             alert("erer")
           })
+        },
+        gotoaddPro:function () {
+          this.toaddPro=true;
+          this.addform={
+            name:"",
+            namech:"",
+            typeid:"请选择",
+            type:"",
+            issku:""
+          }
         }
       }
     }
