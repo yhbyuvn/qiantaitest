@@ -28,6 +28,11 @@ export default new Router({
           path:'/tabs',
           component:()=> import('../components/page/Pro.vue'),
           meta:{title:'属性'}
+        },
+        {
+          path:'/icon',
+          component:()=> import('../components/page/Goods.vue'),
+          meta:{title:'商品'}
         }
       ]
     }
