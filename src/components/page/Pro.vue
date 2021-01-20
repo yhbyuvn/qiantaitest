@@ -53,8 +53,8 @@
 
           </el-table>
 
-          <div>
-            <el-form :model="addPvform" v-if="toaddProVal" :rules="ptrules">
+          <div v-if="toaddProVal">
+            <el-form :model="addPvform"  :rules="ptrules">
               <el-form-item label="属性" >
                 <el-input v-model="addPvform.pvname" autocomplete="off" disabled></el-input>
               </el-form-item>
@@ -364,17 +364,15 @@
             },
             ptrules:{
               value:[
-                { required: true, message: '请输入名称', trigger: 'blur' },
-                { validator: checkValue, trigger: 'blur' }
+                { required: true, message: '请输入', trigger: 'blur' },
               ],
               valuech:[
-                { required: true, message: '请输入名称', trigger: 'blur' },
-                { validator: checkValuech, trigger: 'blur' }
+                { required: true, message: '请输入', trigger: 'blur' },
               ]
             },
             pvDivProid:"",
             protypes:[],
-            proTypeName:"",
+            proTypeName:""
           }
 
         },
