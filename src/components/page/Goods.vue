@@ -57,9 +57,9 @@
         </el-form-item>
       </el-form>
 
-      <el-form ref="form" :model="formGoodsAdd" label-width="80px" v-if="active==1">
+      <el-form ref="form" :model="formGoodsAdd2" label-width="80px" v-if="active==1">
         <el-form-item label="类型" >
-          <el-select v-model="formGoodsAdd.typeid" placeholder="请选择" @change="chaProByTypeid">
+          <el-select v-model="formGoodsAdd2.typeid" placeholder="请选择" @change="chaProByTypeid">
             <el-option
               v-for="item in protypes"
               :key="item.id"
@@ -76,21 +76,20 @@
             border
             style="width: 100%">
 
-            <!--<el-table-column
-              prop="color"
-              label="序号"
-              width="150">
-            </el-table-column>
 
-            <el-table-column
-              prop="ssd"
-              label="序号"
-              width="150">
-            </el-table-column>-->
             <el-table-column v-for="p1 in skuData" :key="p1.id" :label="p1.namech" :prop="p1.name">
             </el-table-column>
 
-
+            <el-table-column
+              label="库存"
+              width="150">
+              <el-input></el-input>
+            </el-table-column>
+            <el-table-column
+              label="价格"
+              width="150">
+              <el-input></el-input>
+            </el-table-column>
 
           </el-table>
         </el-form-item>
@@ -125,8 +124,8 @@
 
             <el-input v-if="p1.type==0"></el-input>
 
-            <el-radio-group v-if="p1.type==1">
-              <el-radio v-for="p2 in p1.values" :label="p2.valuech" :key="p2.id"></el-radio>
+            <el-radio-group v-if="p1.type==1" v-model="ooo">
+              <el-radio v-for="p2 in p1.values" :label="p2.valuech" :key="p2.id" ></el-radio>
             </el-radio-group>
 
             <el-checkbox-group v-if="p1.type==2" v-model="lpl">
@@ -148,6 +147,7 @@
         <el-form-item align="center">
           <el-button type="primary" @click="rollback">上一步</el-button>
           <el-button type="primary" @click="next">下一步</el-button>
+          <el-button type="primary" @click="addGoods">提交</el-button>
         </el-form-item>
       </el-form>
 
@@ -160,9 +160,14 @@
     name: "Goods",
     data(){
       return{
+        ooo:"",
         active: 0,
         lpl:[],
         lol:[],
+        formGoodsAdd2:{
+          typeid:"",
+          goodsid:""
+        },
         formGoodsAdd:{
           name:"",
           title:"",
@@ -172,6 +177,7 @@
           stocks:"",
           sortnum:"",
           typeid:"",
+          imgpath:""
         },
         brandData:[],
         tiaoZhuan:1,
@@ -203,7 +209,7 @@
 
       },
       uploadGoods:function (response,imgpath,images) {
-        this.upform.imgpath=response.data;
+        this.formGoodsAdd.imgpath=response.data;
       },
       chaBrand:function (page) {
         this.$axios.post("http://localhost:8080/api/type/chaBrand?page=" + page + "&limit=" + 1000).then(dd => {
@@ -323,7 +329,6 @@
           this.arr1=this.doDcl(this.arr);
           for (let i = 0; i <this.arr1.length ; i++) {
             let  tableValue={};
-            debugger
             for (let j = 0; j <this.arr1[i].length ; j++) {
               let key=this.cols[j].name;
               tableValue[key]=this.arr1[i][j];
@@ -370,6 +375,15 @@
             return r;
           }
         })(arguments.length > 1 ? arguments : arguments[0]);
+      },
+      addGoods:function () {
+        this.formGoodsAdd.typeid=this.formGoodsAdd2.typeid;
+        var data=this.$qs.stringify(this.formGoodsAdd);
+        this.$axios.post("http://localhost:8080/api/type/addGoods",data).then(dd=>{
+          alert(dd.data.data);
+        }).catch(function () {
+          alert("error")
+        })
       }
     },
     created:function(){

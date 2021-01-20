@@ -531,6 +531,7 @@
           })
         },
         doProValue:function (index,row) {
+          this.toaddProVal=false;
           this.todoProValue=true;
 
           this.pvDivName=row.name+"的相关操作";
