@@ -83,12 +83,17 @@
             <el-table-column
               label="库存"
               width="150">
-              <el-input></el-input>
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.storcks"></el-input>
+              </template>
+
             </el-table-column>
             <el-table-column
               label="价格"
               width="150">
-              <el-input></el-input>
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.price"></el-input>
+              </template>
             </el-table-column>
 
           </el-table>
@@ -122,17 +127,17 @@
         <el-form-item label="商品参数" v-if="proData.length>0">
           <el-form-item v-for="p1 in proData" :key="p1.id" :label="p1.namech">
 
-            <el-input v-if="p1.type==0"></el-input>
+            <el-input v-if="p1.type==0" v-model="p1.ischks"></el-input>
 
-            <el-radio-group v-if="p1.type==1" v-model="ooo">
+            <el-radio-group v-if="p1.type==1" v-model="p1.ischks">
               <el-radio v-for="p2 in p1.values" :label="p2.valuech" :key="p2.id" ></el-radio>
             </el-radio-group>
 
-            <el-checkbox-group v-if="p1.type==2" v-model="lpl">
+            <el-checkbox-group v-if="p1.type==2" v-model="p1.ischks">
               <el-checkbox v-for="p2 in p1.values" :label="p2.valuech" :key="p2.id"></el-checkbox>
             </el-checkbox-group>
 
-            <el-select  placeholder="请选择" v-model="lol" v-if="p1.type==3">
+            <el-select  placeholder="请选择" v-model="p1.ischks" v-if="p1.type==3">
               <el-option
                 v-for="p2 in p1.values"
                 :key="p2.id"
@@ -288,9 +293,11 @@
                     if (prodatas[i].type!=0) {
                       this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+prodatas[i].id).then(dd=>{
                         prodatas[i].values=dd.data.data;
+                        prodatas[i].ischks=[];
                         this.proData.push(prodatas[i]);
                       })
                     }else {
+                      prodatas[i].ischks=[];
                       this.proData.push(prodatas[i]);
                     }
 
@@ -316,7 +323,7 @@
             qwer=false;
             break;
           }
-        }console.log(this.cols)
+        }
         this.chkyos=qwer;
         if (this.chkyos==true){
             this.arr=[];
@@ -329,13 +336,18 @@
           this.arr1=this.doDcl(this.arr);
           for (let i = 0; i <this.arr1.length ; i++) {
             let  tableValue={};
-            for (let j = 0; j <this.arr1[i].length ; j++) {
-              let key=this.cols[j].name;
-              tableValue[key]=this.arr1[i][j];
-              //var opop='"'+this.arr1[i][j]+'"'
-              //this.arr3.push(JSON.parse("{"+'"z'+i+j+'"'+':'+opop+"}"))
-              //console.log('"z'+i+j+'"')
+            if (typeof this.arr1[i]=="object"){
+              for (let j = 0; j <this.arr1[i].length ; j++) {
+                let key=this.cols[j].name;
+                tableValue[key]=this.arr1[i][j];
+                //var opop='"'+this.arr1[i][j]+'"'
+                //this.arr3.push(JSON.parse("{"+'"z'+i+j+'"'+':'+opop+"}"))
+                //console.log('"z'+i+j+'"')
                 //this.arr2.push('z'+i+j+'');
+              }
+            } else {
+              let key=this.cols[0].name;
+              tableValue[key]=this.arr1[i];
             }
             this.arr3.push(tableValue);
           }
@@ -378,12 +390,23 @@
       },
       addGoods:function () {
         this.formGoodsAdd.typeid=this.formGoodsAdd2.typeid;
+        let pros=[];
+        for (let i = 0; i <this.proData.length ; i++) {
+          let proda={};
+          proda[this.proData[i].name]=this.proData[i].ischks;
+          pros.push(proda);
+        }
+        this.formGoodsAdd.pros=JSON.stringify(pros);
+        this.formGoodsAdd.sku=JSON.stringify(this.arr3);
+        console.log(this.formGoodsAdd)
         var data=this.$qs.stringify(this.formGoodsAdd);
         this.$axios.post("http://localhost:8080/api/type/addGoods",data).then(dd=>{
-          alert(dd.data.data);
+          alert("eee")
         }).catch(function () {
           alert("error")
         })
+        //console.log(this.arr3);
+        //console.log(this.proData);
       }
     },
     created:function(){

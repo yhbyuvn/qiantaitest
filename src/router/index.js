@@ -33,6 +33,11 @@ export default new Router({
           path:'/icon',
           component:()=> import('../components/page/Goods.vue'),
           meta:{title:'商品'}
+        },
+        {
+          path:'/charts',
+          component:()=> import('../components/page/GoodsShow.vue'),
+          meta:{title:'商品'}
         }
       ]
     }

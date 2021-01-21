@@ -103,12 +103,12 @@ export default {
                 {
                     icon: 'el-icon-lx-emoji',
                     index: 'icon',
-                    title: '商品表'
+                    title: '商品新增表'
                 },
                 {
                     icon: 'el-icon-pie-chart',
                     index: 'charts',
-                    title: 'schart图表'
+                    title: '商品展示表'
                 },
                 {
                     icon: 'el-icon-rank',
