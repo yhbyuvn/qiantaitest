@@ -4,16 +4,17 @@
       <el-steps :active="active" finish-status="success">
         <el-step title="步骤 1"></el-step>
         <el-step title="步骤 2"></el-step>
+        <el-step title="步骤 3"></el-step>
       </el-steps>
       <br><br><br><br>
-      <el-form ref="form" :rules="addGoodsRule" :model="formGoodsAdd" label-width="80px" v-if="active==0">
-        <el-form-item label="商品名称" prop="name">
+      <el-form ref="form" :model="formGoodsAdd" label-width="80px" v-if="active==0">
+        <el-form-item label="商品名称">
           <el-input v-model="formGoodsAdd.name"></el-input>
         </el-form-item>
-        <el-form-item label="商品标题" prop="title">
+        <el-form-item label="商品标题">
           <el-input v-model="formGoodsAdd.title"></el-input>
         </el-form-item>
-        <el-form-item label="品牌" align="left" prop="brandid">
+        <el-form-item label="品牌" align="left">
           <el-select  v-model="formGoodsAdd.brandid" placeholder="请选择">
             <el-option
               v-for="item in brandData"
@@ -24,9 +25,8 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="商品介绍" prop="productdecs">
-          <el-input type="textarea" v-model="formGoodsAdd.productdecs" maxlength="50"
-                    show-word-limit></el-input>
+        <el-form-item label="商品介绍">
+          <el-input type="textarea" v-model="formGoodsAdd.productdecs"></el-input>
         </el-form-item>
 
         <el-upload
@@ -53,7 +53,7 @@
         </el-form-item>
 
         <el-form-item align="center">
-          <el-button type="primary" @click="next('form')">下一步</el-button>
+          <el-button type="primary" @click="next">下一步</el-button>
         </el-form-item>
       </el-form>
 
@@ -151,6 +151,7 @@
 
         <el-form-item align="center">
           <el-button type="primary" @click="rollback">上一步</el-button>
+          <el-button type="primary" @click="next">下一步</el-button>
           <el-button type="primary" @click="addGoods">提交</el-button>
         </el-form-item>
       </el-form>
@@ -194,33 +195,13 @@
         arr1:[],
         arr2:[],
         arr3:[],
-        cols:[],
-        addGoodsRule:{
-          name:[{ required: true, message: '请输入名称', trigger: 'blur' },
-            { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }],
-          title: [
-            { required: true, message: '请输入标题', trigger: 'change' }
-          ],
-          productdecs: [
-            { type: 'string', required: true, message: '请输入介绍', trigger: 'change' }
-          ],
-          brandid: [
-            { type: 'date', required: true, message: '请选择品牌', trigger: 'change' }
-          ]
-        }
+        cols:[]
       }
     },
     methods:{
-      next:function (form) {
-        this.$refs[form].validate(dd=>{
-          if (dd){
-            this.active++;
-            this.tiaoZhuan+=1;
-          } else {
-            return false;
-          }
-        })
-
+      next:function () {
+        this.active++;
+        this.tiaoZhuan+=1;
 
       },
       rollback:function () {
@@ -285,18 +266,42 @@
         }
       },
       chaProByTypeid:function (typeid) {
-        this.$axios.post("http://localhost:8080/api/type/chaProValueByTypeid?typeid="+typeid).then(dd=>{
+        this.$axios.post("http://localhost:8080/api/type/chaProByTypeid?typeid="+typeid).then(dd=>{
           this.chkyos=false,
-            console.log(dd.data.data)
-          this.skuData=dd.data.data.skuData;
-          for (let i = 0; i <this.skuData.length ; i++) {
-            this.skuData[i].ischks=[]
-          }
-          this.proData=dd.data.data.proData;
-          for (let i = 0; i <this.proData.length ; i++) {
-            if (this.proData[i].type==2){
-              this.proData[i].ischks=[]
+            this.proData=[];
+          this.skuData=[];
+          var prodatas=dd.data.data;
+          if (prodatas.length>0){
+            for (let i = 0; i <prodatas.length ; i++) {
+              if (prodatas[i].issku==1){
+                if (prodatas[i].type!=0){
+                  this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+prodatas[i].id).then(dd=>{
+                    prodatas[i].values=dd.data.data;
+                    prodatas[i].ischks=[];
+                    this.skuData.push(prodatas[i])
+                  })
+                }else {
+                  prodatas[i].ischks=[];
+                  this.skuData.push(prodatas[i])
+                }
+
+              }else {
+                if (prodatas[i].type!=0) {
+                  this.$axios.post("http://localhost:8080/api/type/chaProValue?proid="+prodatas[i].id).then(dd=>{
+                    prodatas[i].values=dd.data.data;
+                    prodatas[i].ischks=[];
+                    this.proData.push(prodatas[i]);
+                  })
+                }else {
+                  prodatas[i].ischks=[];
+                  this.proData.push(prodatas[i]);
+                }
+
+              }
             }
+          }else {
+            this.proData=[];
+            this.skuData=[];
           }
         }).catch(function () {
           alert("error")
@@ -305,8 +310,7 @@
       ischk:function () {
         this.arr=[];
         this.cols=[];
-        this.$forceUpdate();
-       var qwer=true;
+        var qwer=true;
         for (let i = 0; i <this.skuData.length ; i++) {
 
           this.cols.push({"id":this.skuData[i].id,"nameCH":this.skuData[i].nameCH,"name":this.skuData[i].name});
@@ -318,10 +322,10 @@
         }
         this.chkyos=qwer;
         if (this.chkyos==true){
-            this.arr=[];
-            this.arr1=[];
-            this.arr2=[];
-            this.arr3=[];
+          this.arr=[];
+          this.arr1=[];
+          this.arr2=[];
+          this.arr3=[];
           for (let i = 0; i <this.skuData.length ; i++) {
             this.arr.push(this.skuData[i].ischks);
           }
